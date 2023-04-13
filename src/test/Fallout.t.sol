@@ -29,6 +29,10 @@ contract FalloutTest is Test {
         // LEVEL ATTACK //
         //////////////////
 
+        // It is possible to call directly Fal1out to claim ownership
+        // It is not protected
+        ethernautFallout.Fal1out();
+
         //////////////////////
         // LEVEL SUBMISSION //
         //////////////////////
