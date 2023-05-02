@@ -9,6 +9,8 @@ interface Solver {
     function whatIsTheMeaningOfLife() external view returns (bytes32);
 }
 
+import "forge-std/console.sol";
+
 contract MagicNumFactory is Level {
     function createInstance(address) public payable override returns (address) {
         return address(new MagicNum());
